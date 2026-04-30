@@ -15,15 +15,28 @@ const io     = new Server(server);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-console.log('Serving static from:', path.join(__dirname, 'public'));
+console.log('📁 App directory  :', __dirname);
+console.log('🌐 Static from    :', path.join(__dirname, 'public'));
 
-// ── Anti-ban settings ─────────────────────────────────────────────────────────
-const MSG_DELAY_MS   = 10000;
-const BATCH_SIZE     = 50;
-const BATCH_PAUSE_MS = 5 * 60 * 1000;
+// ── Paths — use absolute paths so PM2 never gets confused ────────────────────
+const APP_DIR     = __dirname;
+const SESSION_DIR = path.join(APP_DIR, '.wwebjs_auth');
+const CACHE_DIR   = path.join(APP_DIR, '.wwebjs_cache');
+const LOGS_DIR    = path.join(APP_DIR, 'logs');
+
+// Make sure logs folder exists
+if (!fs.existsSync(LOGS_DIR)) fs.mkdirSync(LOGS_DIR, { recursive: true });
+
+// ── Anti-ban randomised timing ────────────────────────────────────────────────
+const MSG_DELAY   = { min: 8000,      max: 20000     }; // 8s–20s between messages
+const BATCH_SIZE  = { min: 30,        max: 70        }; // 30–70 messages per batch
+const BATCH_PAUSE = { min: 4 * 60000, max: 8 * 60000 }; // 4–8 min between batches
 const MAX_RETRIES    = 2;
 const RETRY_DELAY_MS = 6000;
-const SESSION_DIR    = path.join(__dirname, '.wwebjs_auth');
+
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 // ── Multer ────────────────────────────────────────────────────────────────────
 const upload = multer({
@@ -41,23 +54,31 @@ function toChatId(phone) {
 }
 
 function deleteSession() {
-  try {
-    if (fs.existsSync(SESSION_DIR)) {
-      fs.rmSync(SESSION_DIR, { recursive: true, force: true });
-      console.log('🗑  Session files deleted');
+  [SESSION_DIR, CACHE_DIR].forEach((dir) => {
+    try {
+      if (fs.existsSync(dir)) {
+        fs.rmSync(dir, { recursive: true, force: true });
+        console.log('🗑  Deleted:', dir);
+      }
+    } catch (e) {
+      console.warn('Could not delete', dir, ':', e.message);
     }
-  } catch (e) {
-    console.warn('Could not delete session files:', e.message);
-  }
+  });
 }
 
 async function sendOne(chatId, message, mediaBuffer, mediaMime, mediaName) {
   for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
     try {
       if (mediaBuffer) {
-        const b64   = mediaBuffer.toString('base64');
-        const media = new MessageMedia(mediaMime, b64, mediaName);
-        await client.sendMessage(chatId, media, { caption: message });
+        const b64    = mediaBuffer.toString('base64');
+        const media  = new MessageMedia(mediaMime, b64, mediaName);
+        const isPdf  = mediaMime === 'application/pdf';
+        if (isPdf) {
+          if (message) await client.sendMessage(chatId, message);
+          await client.sendMessage(chatId, media, { sendMediaAsDocument: true });
+        } else {
+          await client.sendMessage(chatId, media, { caption: message });
+        }
       } else {
         await client.sendMessage(chatId, message);
       }
@@ -71,31 +92,45 @@ async function sendOne(chatId, message, mediaBuffer, mediaMime, mediaName) {
 }
 
 // ── WhatsApp client factory ───────────────────────────────────────────────────
-// We use a factory so we can re-create the client after logout
 let client;
 let waReady = false;
 let waQr    = null;
 
 function createClient() {
+  console.log('🔧 Creating WhatsApp client...');
+  console.log('💾 Session path:', SESSION_DIR);
+
   const c = new Client({
-    authStrategy: new LocalAuth({ clientId: 'wa-sender', dataPath: SESSION_DIR }),
+    authStrategy: new LocalAuth({
+      clientId: 'wa-sender',
+      dataPath:  SESSION_DIR,   // absolute path — safe with PM2
+    }),
     puppeteer: {
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',     // prevents crashes on low-memory servers
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu',
+      ],
     },
   });
 
   c.on('qr', async (qr) => {
+    console.log('📱 QR code ready — waiting for scan...');
     waQr = await qrcode.toDataURL(qr);
     io.emit('qr', waQr);
     io.emit('status', { state: 'qr', message: 'Scan QR code with WhatsApp' });
-    console.log('📱 QR code generated — waiting for scan...');
   });
 
   c.on('authenticated', () => {
     waQr = null;
+    console.log('🔐 Authenticated successfully');
     io.emit('status', { state: 'authenticated', message: 'Authenticated — loading...' });
-    console.log('🔐 Authenticated');
   });
 
   c.on('ready', () => {
@@ -106,22 +141,35 @@ function createClient() {
     io.emit('status', { state: 'ready', message: 'WhatsApp connected ✓' });
   });
 
-  c.on('auth_failure', () => {
+  c.on('auth_failure', (msg) => {
     waReady = false;
-    console.error('❌ Auth failure');
-    io.emit('status', { state: 'error', message: 'Authentication failed. Restart server.' });
+    console.error('❌ Auth failure:', msg);
+    // Delete bad session so next restart shows fresh QR
+    deleteSession();
+    io.emit('status', { state: 'error', message: 'Auth failed — restart server to scan QR again.' });
   });
 
   c.on('disconnected', (reason) => {
     waReady = false;
     console.log('🔌 Disconnected:', reason);
-    io.emit('status', { state: 'disconnected', message: 'Disconnected.' });
+    io.emit('status', { state: 'disconnected', message: 'Disconnected. Reconnecting...' });
+
+    // Auto reconnect after 5 seconds
+    setTimeout(() => {
+      console.log('🔄 Auto-reconnecting...');
+      try {
+        client = createClient();
+        client.initialize();
+      } catch (e) {
+        console.error('Auto-reconnect failed:', e.message);
+      }
+    }, 5000);
   });
 
   return c;
 }
 
-// Boot the client on startup
+// ── Boot ──────────────────────────────────────────────────────────────────────
 client = createClient();
 client.initialize();
 
@@ -190,12 +238,13 @@ app.post(
       const chatId = toChatId(phone);
       const text   = customMessage || globalMessage;
 
-      // Batch pause every BATCH_SIZE messages
-      if (i > 0 && i % BATCH_SIZE === 0) {
-        const pauseMin = Math.round(BATCH_PAUSE_MS / 60000);
-        console.log(`⏸  Batch pause after ${i} messages — waiting ${pauseMin} min...`);
-        emit({ type: 'batch_pause', index: i, pause_ms: BATCH_PAUSE_MS });
-        await sleep(BATCH_PAUSE_MS);
+      // Batch pause
+      const batchSize = rand(BATCH_SIZE.min, BATCH_SIZE.max);
+      if (i > 0 && i % batchSize === 0) {
+        const batchPause = rand(BATCH_PAUSE.min, BATCH_PAUSE.max);
+        console.log(`⏸  Batch pause — waiting ${Math.round(batchPause / 60000)}m ${Math.round((batchPause % 60000) / 1000)}s...`);
+        emit({ type: 'batch_pause', index: i, pause_ms: batchPause });
+        await sleep(batchPause);
         emit({ type: 'batch_resume', index: i });
       }
 
@@ -225,10 +274,8 @@ app.post(
         emit({ type: 'result', index: i, phone, name, ok: false, error: err.message });
       }
 
-      // Delay with random jitter ±2s to look human
       if (i < contacts.length - 1) {
-        const jitter = Math.floor(Math.random() * 4000) - 2000;
-        await sleep(MSG_DELAY_MS + jitter);
+        await sleep(rand(MSG_DELAY.min, MSG_DELAY.max));
       }
     }
 
@@ -238,58 +285,58 @@ app.post(
   }
 );
 
-// ── API: logout ───────────────────────────────────────────────────────────────
+// ── API: logout — destroys session + forces fresh QR on reconnect ─────────────
 app.post('/api/logout', async (req, res) => {
-  // 1. Mark as not ready immediately
+  console.log('👋 Logout requested...');
+
+  // 1. Mark not ready immediately
   waReady = false;
   waQr    = null;
 
-  // 2. Gracefully logout / destroy current client
+  // 2. Gracefully stop the client
   try { await client.logout();  } catch (_) {}
   try { await client.destroy(); } catch (_) {}
 
-  // 3. Delete saved session files so QR is always required on next connect
+  // 3. Wipe ALL session & cache files (.wwebjs_auth + .wwebjs_cache)
   deleteSession();
 
-  // 4. Tell all browser tabs: logged out, show QR screen
+  // 4. Notify all browser tabs
   io.emit('status', { state: 'logged_out', message: 'Logged out — scan QR to reconnect' });
-  console.log('👋 Logged out — session cleared');
+  console.log('✅ Session wiped — waiting for new QR scan');
 
-  // 5. Re-create and re-initialize client so QR appears immediately
-  //    without needing a server restart
+  res.json({ ok: true });
+
+  // 5. Reinitialise client after a short delay so fresh QR appears in browser
   setTimeout(() => {
     try {
       client = createClient();
       client.initialize();
-      console.log('🔄 New WhatsApp client initializing...');
+      console.log('🔄 New client initializing...');
     } catch (e) {
-      console.error('Failed to reinitialize client:', e.message);
+      console.error('Reinit failed:', e.message);
     }
-  }, 2000); // 2s delay to let destroy() finish cleanly
-
-  res.json({ ok: true });
+  }, 3000);
 });
 
 // ── Socket.IO ─────────────────────────────────────────────────────────────────
 io.on('connection', (socket) => {
-  // Send current state to newly connected browser tab
-  if (waQr) {
-    socket.emit('qr', waQr);
-  }
+  if (waQr) socket.emit('qr', waQr);
   socket.emit('status', {
-    state:   waReady ? 'ready' : 'loading',
+    state:   waReady ? 'ready'   : 'loading',
     message: waReady ? 'WhatsApp connected ✓' : 'Connecting to WhatsApp...',
   });
 });
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
+
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
     console.error(`\n❌ Port ${PORT} is already in use.\nRun: kill -9 $(lsof -ti :${PORT})\n`);
     process.exit(1);
   }
 });
+
 server.listen(PORT, () => {
   console.log(`\n🚀 Server running → http://localhost:${PORT}\n`);
 });

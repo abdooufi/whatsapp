@@ -475,10 +475,10 @@
       <div class="field">
         <label>Attach Image (optional)</label>
         <div class="drop-zone" id="dz-single">
-          <input type="file" id="single-image" accept="image/*" onchange="previewImage('single')" />
+          <input type="file" id="single-image" accept="image/*,application/pdf" onchange="previewImage('single')" />
           <div class="dz-icon">🖼️</div>
           <div class="dz-label"><strong>Click to choose</strong> or drag &amp; drop</div>
-          <div class="dz-label">PNG, JPG, WEBP — max 20 MB</div>
+          <div class="dz-label">PNG, JPG, WEBP, PDF — max 20 MB</div>
           <div class="dz-file" id="single-img-name"></div>
         </div>
         <div id="img-preview-single">
@@ -524,7 +524,7 @@
       <div class="field">
         <label>Attach Image (optional — sent to all)</label>
         <div class="drop-zone" id="dz-bulk-img">
-          <input type="file" id="bulk-image" accept="image/*" onchange="previewImage('bulk')" />
+          <input type="file" id="bulk-image" accept="image/*,application/pdf" onchange="previewImage('bulk')" />
           <div class="dz-icon">🖼️</div>
           <div class="dz-label"><strong>Click to choose</strong> or drag &amp; drop</div>
           <div class="dz-file" id="bulk-img-name"></div>
@@ -610,12 +610,28 @@
     const file = input.files[0];
     if (!file) return;
     document.getElementById(prefix + '-img-name').textContent = file.name;
-    const reader = new FileReader();
-    reader.onload = e => {
-      document.getElementById('img-preview-' + prefix + '-img').src = e.target.result;
-      document.getElementById('img-preview-' + prefix).style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+
+    const previewWrap = document.getElementById('img-preview-' + prefix);
+    const previewImg  = document.getElementById('img-preview-' + prefix + '-img');
+
+    if (file.type === 'application/pdf') {
+      // Show a PDF placeholder instead of trying to render it
+      previewImg.src = 'data:image/svg+xml,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">' +
+        '<rect width="80" height="80" rx="10" fill="#1c1c26"/>' +
+        '<text x="40" y="36" text-anchor="middle" font-size="28">📄</text>' +
+        '<text x="40" y="58" text-anchor="middle" font-size="11" fill="#6b6b85" font-family="monospace">PDF</text>' +
+        '</svg>'
+      );
+      previewWrap.style.display = 'block';
+    } else {
+      const reader = new FileReader();
+      reader.onload = e => {
+        previewImg.src = e.target.result;
+        previewWrap.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   function removeImage(prefix) {

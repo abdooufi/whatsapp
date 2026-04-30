@@ -1,0 +1,85 @@
+2026-04-30T07:44:02: Serving static from: /Users/abdullah/Desktop/node/whatsapp/public
+2026-04-30T07:44:02: 
+2026-04-30T07:44:02: 🚀 Server running → http://localhost:3000
+2026-04-30T07:44:02: 
+2026-04-30T07:44:09: 📱 QR code generated — waiting for scan...
+2026-04-30T07:45:05: 🔐 Authenticated
+2026-04-30T07:45:05: 🔐 Authenticated
+2026-04-30T07:45:05: 🔐 Authenticated
+2026-04-30T07:45:05: 🔐 Authenticated
+2026-04-30T07:45:05: 🔐 Authenticated
+2026-04-30T07:45:06: ✅ WhatsApp client ready
+2026-04-30T07:45:57: 
+2026-04-30T07:45:57: 📤 Bulk send started — 1 contacts
+2026-04-30T07:45:57:   ✅ [1/1] Row 2 (96898216618)
+2026-04-30T07:45:57: 
+2026-04-30T07:45:57: 📊 Done — ✅ 1 sent, ❌ 0 failed
+2026-04-30T07:45:57: 
+2026-04-30T07:50:09: 🔐 Authenticated
+2026-04-30T07:50:09: ✅ WhatsApp client ready
+2026-04-30T07:50:39: Serving static from: /Users/abdullah/Desktop/node/whatsapp/public
+2026-04-30T07:50:39: 
+2026-04-30T07:50:39: 🚀 Server running → http://localhost:3000
+2026-04-30T07:50:39: 
+2026-04-30T07:50:42: 🔐 Authenticated
+2026-04-30T08:00:43: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-04-30T08:00:43: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-04-30T08:00:43: 🔧 Creating WhatsApp client...
+2026-04-30T08:00:43: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-04-30T08:00:43: 
+2026-04-30T08:00:43: 🚀 Server running → http://localhost:3000
+2026-04-30T08:00:43: 
+2026-04-30T08:00:48: 🔐 Authenticated successfully
+2026-04-30T08:02:31: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-04-30T08:02:31: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-04-30T08:02:31: 🔧 Creating WhatsApp client...
+2026-04-30T08:02:31: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-04-30T08:02:31: 
+2026-04-30T08:02:31: 🚀 Server running → http://localhost:3000
+2026-04-30T08:02:31: 
+2026-04-30T08:02:36: 🔐 Authenticated successfully
+2026-04-30T08:04:34: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-04-30T08:04:34: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-04-30T08:04:34: 🔧 Creating WhatsApp client...
+2026-04-30T08:04:34: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-04-30T08:04:34: 
+2026-04-30T08:04:34: 🚀 Server running → http://localhost:3000
+2026-04-30T08:04:34: 
+2026-04-30T08:04:40: 📱 QR code ready — waiting for scan...
+2026-04-30T08:05:21: 🔐 Authenticated successfully
+2026-04-30T08:05:21: 🔐 Authenticated successfully
+2026-04-30T08:05:21: 🔐 Authenticated successfully
+2026-04-30T08:05:21: 🔐 Authenticated successfully
+2026-04-30T08:05:21: 🔐 Authenticated successfully
+2026-04-30T08:05:22: ✅ WhatsApp client ready
+2026-04-30T08:06:03: 
+2026-04-30T08:06:03: 📤 Bulk send started — 1 contacts
+2026-04-30T08:06:07:   ✅ [1/1] Row 2 (96898216618)
+2026-04-30T08:06:07: 
+2026-04-30T08:06:07: 📊 Done — ✅ 1 sent, ❌ 0 failed
+2026-04-30T08:06:07: 
+2026-04-30T08:06:28: 
+2026-04-30T08:06:28: 📤 Bulk send started — 1 contacts
+2026-04-30T08:06:29:   ✅ [1/1] Row 2 (96898216618)
+2026-04-30T08:06:29: 
+2026-04-30T08:06:29: 📊 Done — ✅ 1 sent, ❌ 0 failed
+2026-04-30T08:06:29: 
+2026-04-30T08:10:25: 🔐 Authenticated successfully
+2026-04-30T08:10:25: ✅ WhatsApp client ready
+2026-04-30T08:34:13: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-04-30T08:34:13: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-04-30T08:34:13: 🔧 Creating WhatsApp client...
+2026-04-30T08:34:13: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-04-30T08:34:13: 
+2026-04-30T08:34:13: 🚀 Server running → http://localhost:3000
+2026-04-30T08:34:13: 
+2026-04-30T08:34:19: 🔐 Authenticated successfully
+2026-04-30T08:34:19: ✅ WhatsApp client ready
+2026-04-30T08:35:46: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-04-30T08:35:46: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-04-30T08:35:46: 🔧 Creating WhatsApp client...
+2026-04-30T08:35:46: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-04-30T08:35:46: 
+2026-04-30T08:35:46: 🚀 Server running → http://localhost:3000
+2026-04-30T08:35:46: 
+2026-04-30T08:35:50: 📱 QR code ready — waiting for scan...
