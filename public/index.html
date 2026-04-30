@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WA Sender</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: #2a2a38;
+    --green: #25d366;
+    --green-dim: #1a9647;
+    --green-glow: rgba(37,211,102,0.18);
+    --accent: #a8ff78;
+    --text: #e8e8f0;
+    --muted: #6b6b85;
+    --error: #ff4f4f;
+    --warn: #ffb347;
+    --radius: 14px;
+    --font: 'Syne', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Animated background ───────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 15% 20%, rgba(37,211,102,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 85% 80%, rgba(168,255,120,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── Layout ────────────────────────────────────────────── */
+  .app {
+    position: relative; z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── Header ────────────────────────────────────────────── */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.5rem 0 2.5rem;
+  }
+  .logo {
+    display: flex; align-items: center; gap: .75rem;
+  }
+  .logo-icon {
+    width: 42px; height: 42px;
+    background: var(--green);
+    border-radius: 12px;
+    display: grid; place-items: center;
+    box-shadow: 0 0 24px var(--green-glow);
+    font-size: 1.3rem;
+  }
+  .logo-text { font-size: 1.35rem; font-weight: 800; letter-spacing: -.02em; }
+  .logo-text span { color: var(--green); }
+
+  /* ── Status pill ───────────────────────────────────────── */
+  #status-pill {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .4rem .9rem;
+    border-radius: 99px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: .72rem;
+    transition: all .3s;
+  }
+  #status-pill .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--muted);
+    transition: background .3s;
+  }
+  #status-pill.ready .dot { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
+  #status-pill.error .dot { background: var(--error); }
+  #status-pill.qr .dot { background: var(--warn); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: .4; }
+  }
+
+  /* ── Logout button ─────────────────────────────────────── */
+  .header-right { display: flex; align-items: center; gap: .5rem; }
+  #btn-logout {
+    display: none;
+    align-items: center; gap: .4rem;
+    padding: .4rem .9rem;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--error);
+    font-family: var(--mono);
+    font-size: .72rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  #btn-logout:hover { background: var(--error); color: #fff; border-color: var(--error); }
+  #btn-logout.visible { display: flex; }
+
+  /* ── Confirm dialog ────────────────────────────────────── */
+  #confirm-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,.75);
+    backdrop-filter: blur(8px);
+    place-items: center;
+  }
+  #confirm-overlay.show { display: grid; }
+  #confirm-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+    animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  #confirm-box .confirm-icon { font-size: 2.5rem; margin-bottom: .75rem; }
+  #confirm-box h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; }
+  #confirm-box p  { color: var(--muted); font-size: .82rem; margin-bottom: 1.5rem; line-height: 1.5; }
+  .confirm-actions { display: flex; gap: .75rem; }
+  .confirm-actions button {
+    flex: 1; padding: .65rem; border-radius: 10px; border: none;
+    font-family: var(--font); font-size: .88rem; font-weight: 700; cursor: pointer;
+    transition: all .2s;
+  }
+  #confirm-cancel { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  #confirm-cancel:hover { border-color: var(--muted); }
+  #confirm-ok { background: var(--error); color: #fff; }
+  #confirm-ok:hover { opacity: .85; }
+
+  /* ── QR Modal ──────────────────────────────────────────── */
+  #qr-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,.75);
+    backdrop-filter: blur(8px);
+    place-items: center;
+  }
+  #qr-overlay.show { display: grid; }
+  #qr-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    text-align: center;
+    max-width: 340px;
+    width: 90%;
+    animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes popIn {
+    from { transform: scale(.8); opacity: 0; }
+    to   { transform: scale(1);  opacity: 1; }
+  }
+  #qr-box h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; }
+  #qr-box p  { color: var(--muted); font-size: .82rem; margin-bottom: 1.5rem; line-height: 1.5; }
+  #qr-img    { width: 200px; height: 200px; border-radius: 10px; background: #fff; padding: 6px; }
+
+  /* ── Tabs ──────────────────────────────────────────────── */
+  .tabs {
+    display: flex; gap: .5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: .35rem;
+    margin-bottom: 2rem;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: .65rem 1rem;
+    border-radius: calc(var(--radius) - 4px);
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font);
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+  }
+  .tab-btn.active {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 12px rgba(0,0,0,.3);
+  }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  /* ── Panel ─────────────────────────────────────────────── */
+  .panel { display: none; animation: fadeUp .3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Card ──────────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .card-title {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+  }
+
+  /* ── Form elements ─────────────────────────────────────── */
+  .field { margin-bottom: 1.1rem; }
+  label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: .4rem;
+    letter-spacing: .03em;
+  }
+  input[type=text], input[type=tel], textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .75rem 1rem;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: .88rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    resize: vertical;
+  }
+  input[type=text]:focus, input[type=tel]:focus, textarea:focus {
+    border-color: var(--green-dim);
+    box-shadow: 0 0 0 3px var(--green-glow);
+  }
+  textarea { min-height: 100px; }
+  input::placeholder, textarea::placeholder { color: var(--muted); opacity: .7; }
+
+  /* ── File drop zone ────────────────────────────────────── */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--green-dim);
+    background: var(--green-glow);
+  }
+  .drop-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+  .drop-zone .dz-icon { font-size: 2rem; margin-bottom: .5rem; }
+  .drop-zone .dz-label { font-size: .85rem; color: var(--muted); }
+  .drop-zone .dz-label strong { color: var(--text); }
+  .drop-zone .dz-file { font-family: var(--mono); font-size: .78rem; color: var(--green); margin-top: .5rem; }
+
+  /* ── Image preview ─────────────────────────────────────── */
+  #img-preview-single, #img-preview-bulk {
+    display: none;
+    margin-top: .75rem;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  #img-preview-single img, #img-preview-bulk img {
+    width: 100%; max-height: 200px; object-fit: cover; display: block;
+  }
+  .preview-remove {
+    position: absolute; top: .5rem; right: .5rem;
+    background: rgba(0,0,0,.7); border: none; color: #fff;
+    width: 28px; height: 28px; border-radius: 50%;
+    cursor: pointer; font-size: 1rem; display: grid; place-items: center;
+    transition: background .2s;
+  }
+  .preview-remove:hover { background: var(--error); }
+
+  /* ── Submit button ─────────────────────────────────────── */
+  .btn-send {
+    width: 100%;
+    padding: .85rem;
+    background: var(--green);
+    color: #000;
+    font-family: var(--font);
+    font-size: .95rem;
+    font-weight: 800;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .02em;
+    display: flex; align-items: center; justify-content: center; gap: .6rem;
+    margin-top: 1.2rem;
+  }
+  .btn-send:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 6px 24px var(--green-glow); }
+  .btn-send:active { transform: translateY(0); }
+  .btn-send:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .btn-send .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(0,0,0,.3);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+  .btn-send.loading .spinner { display: block; }
+  .btn-send.loading .btn-text { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Toast ─────────────────────────────────────────────── */
+  #toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 99px; padding: .65rem 1.4rem;
+    font-size: .82rem; font-family: var(--mono);
+    white-space: nowrap;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .35s;
+    opacity: 0; z-index: 200;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #toast.success { border-color: var(--green); color: var(--green); }
+  #toast.error   { border-color: var(--error);  color: var(--error);  }
+
+  /* ── Bulk progress ─────────────────────────────────────── */
+  #bulk-progress { display: none; margin-top: 1.5rem; }
+  .progress-header {
+    display: flex; justify-content: space-between;
+    font-size: .78rem; color: var(--muted); margin-bottom: .5rem;
+  }
+  .progress-bar {
+    height: 6px; background: var(--surface2);
+    border-radius: 99px; overflow: hidden; margin-bottom: 1rem;
+  }
+  .progress-fill {
+    height: 100%; background: var(--green);
+    border-radius: 99px; width: 0%;
+    transition: width .4s ease;
+    box-shadow: 0 0 10px var(--green);
+  }
+  .log-list {
+    max-height: 220px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: .35rem;
+  }
+  .log-item {
+    display: flex; align-items: center; gap: .6rem;
+    padding: .45rem .75rem;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-family: var(--mono); font-size: .76rem;
+    animation: fadeIn .2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .log-item .li-icon { font-size: .9rem; flex-shrink: 0; }
+  .log-item .li-name { color: var(--text); flex: 1; }
+  .log-item .li-phone { color: var(--muted); }
+  .log-item.fail .li-name { color: var(--error); }
+
+  /* ── Template hint ─────────────────────────────────────── */
+  .hint {
+    background: var(--surface2);
+    border-left: 3px solid var(--green-dim);
+    border-radius: 0 10px 10px 0;
+    padding: .75rem 1rem;
+    font-size: .78rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1.2rem;
+  }
+  .hint strong { color: var(--text); }
+
+  /* ── Scrollbar ─────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">💬</div>
+      <div class="logo-text">WA<span>Sender</span></div>
+    </div>
+    <div class="header-right">
+      <div id="status-pill">
+        <div class="dot"></div>
+        <span id="status-text">Connecting...</span>
+      </div>
+      <button id="btn-logout" onclick="confirmLogout()">⏏︎ Logout</button>
+    </div>
+  </header>
+
+  <!-- QR overlay -->
+  <div id="qr-overlay">
+    <div id="qr-box">
+      <h2>Scan to Connect</h2>
+      <p id="qr-box-msg">Open WhatsApp on your phone → <strong>Linked Devices</strong> → <strong>Link a Device</strong></p>
+      <img id="qr-img" alt="QR Code" />
+    </div>
+  </div>
+
+  <!-- Confirm logout dialog -->
+  <div id="confirm-overlay">
+    <div id="confirm-box">
+      <div class="confirm-icon">⚠️</div>
+      <h2>Logout from WhatsApp?</h2>
+      <p>This will disconnect your session. You'll need to scan the QR code again to reconnect.</p>
+      <div class="confirm-actions">
+        <button id="confirm-cancel" onclick="closeConfirm()">Cancel</button>
+        <button id="confirm-ok"     onclick="doLogout()">Yes, Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('single', this)">
+      ✏️ Single Message
+    </button>
+    <button class="tab-btn" onclick="switchTab('bulk', this)">
+      📊 Bulk from Excel
+    </button>
+  </div>
+
+  <!-- ── Panel: Single ───────────────────────────── -->
+  <div id="panel-single" class="panel active">
+
+    <div class="card">
+      <div class="card-title">Recipient</div>
+      <div class="field">
+        <label>Phone Number (with country code)</label>
+        <input type="tel" id="single-phone" placeholder="e.g. 96812345678" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Message</div>
+      <div class="field">
+        <label>Text</label>
+        <textarea id="single-message" placeholder="Type your message..."></textarea>
+      </div>
+      <div class="field">
+        <label>Attach Image (optional)</label>
+        <div class="drop-zone" id="dz-single">
+          <input type="file" id="single-image" accept="image/*" onchange="previewImage('single')" />
+          <div class="dz-icon">🖼️</div>
+          <div class="dz-label"><strong>Click to choose</strong> or drag &amp; drop</div>
+          <div class="dz-label">PNG, JPG, WEBP — max 20 MB</div>
+          <div class="dz-file" id="single-img-name"></div>
+        </div>
+        <div id="img-preview-single">
+          <img id="img-preview-single-img" alt="" />
+          <button class="preview-remove" onclick="removeImage('single')">✕</button>
+        </div>
+      </div>
+
+      <button class="btn-send" id="btn-single" onclick="sendSingle()">
+        <div class="spinner"></div>
+        <span class="btn-text">📤 Send Message</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── Panel: Bulk ─────────────────────────────── -->
+  <div id="panel-bulk" class="panel">
+
+    <div class="card">
+      <div class="card-title">Excel File</div>
+      <div class="hint">
+        Your spreadsheet needs a <strong>phone</strong> column (with country code). Optional: <strong>name</strong> and <strong>message</strong> columns for per-contact custom messages.
+      </div>
+      <div class="field">
+        <label>Upload .xlsx File</label>
+        <div class="drop-zone" id="dz-xlsx">
+          <input type="file" id="bulk-xlsx" accept=".xlsx,.xls" onchange="showFileName('bulk-xlsx','xlsx-name')" />
+          <div class="dz-icon">📂</div>
+          <div class="dz-label"><strong>Click to choose</strong> or drag &amp; drop</div>
+          <div class="dz-label">.xlsx or .xls only</div>
+          <div class="dz-file" id="xlsx-name"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Message</div>
+      <div class="field">
+        <label>Default Message <span style="color:var(--muted);font-weight:400">(used when contact has no custom message)</span></label>
+        <textarea id="bulk-message" placeholder="Type your default message..."></textarea>
+      </div>
+      <div class="field">
+        <label>Attach Image (optional — sent to all)</label>
+        <div class="drop-zone" id="dz-bulk-img">
+          <input type="file" id="bulk-image" accept="image/*" onchange="previewImage('bulk')" />
+          <div class="dz-icon">🖼️</div>
+          <div class="dz-label"><strong>Click to choose</strong> or drag &amp; drop</div>
+          <div class="dz-file" id="bulk-img-name"></div>
+        </div>
+        <div id="img-preview-bulk">
+          <img id="img-preview-bulk-img" alt="" />
+          <button class="preview-remove" onclick="removeImage('bulk')">✕</button>
+        </div>
+      </div>
+
+      <button class="btn-send" id="btn-bulk" onclick="sendBulk()">
+        <div class="spinner"></div>
+        <span class="btn-text">🚀 Send to All Contacts</span>
+      </button>
+    </div>
+
+    <!-- Progress -->
+    <div id="bulk-progress">
+      <div class="progress-header">
+        <span id="bulk-progress-label">Sending...</span>
+        <span id="bulk-progress-count">0 / 0</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="bulk-bar"></div></div>
+      <div class="log-list" id="bulk-log"></div>
+    </div>
+
+  </div>
+
+</div><!-- /app -->
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  // ── Socket.IO ──────────────────────────────────────────
+  const socket = io();
+  const statusPill = document.getElementById('status-pill');
+  const statusText = document.getElementById('status-text');
+
+  socket.on('status', ({ state, message }) => {
+    statusPill.className = '';
+    statusPill.classList.add(state);
+    statusText.textContent = message;
+
+    // Show QR overlay when waiting for scan or just logged out
+    if (state === 'qr' || state === 'logged_out') {
+      document.getElementById('qr-overlay').classList.add('show');
+      // Clear old QR image while waiting for new one
+      if (state === 'logged_out') {
+        document.getElementById('qr-img').src = '';
+        document.getElementById('qr-box-msg').textContent = 'Generating new QR code...';
+      }
+    }
+    if (state === 'ready') {
+      document.getElementById('qr-overlay').classList.remove('show');
+      document.getElementById('qr-box-msg').textContent = 'Open WhatsApp on your phone → Linked Devices → Link a Device';
+    }
+  });
+
+  socket.on('qr', (dataUrl) => {
+    document.getElementById('qr-img').src = dataUrl;
+    document.getElementById('qr-box-msg').textContent = 'Open WhatsApp on your phone → Linked Devices → Link a Device';
+    document.getElementById('qr-overlay').classList.add('show');
+  });
+
+  // Server emits this when client becomes ready after re-init
+  socket.on('qr_clear', () => {
+    document.getElementById('qr-overlay').classList.remove('show');
+  });
+
+  // ── Tabs ───────────────────────────────────────────────
+  function switchTab(name, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ── Image preview ──────────────────────────────────────
+  function previewImage(prefix) {
+    const input = document.getElementById(prefix + '-image');
+    const file = input.files[0];
+    if (!file) return;
+    document.getElementById(prefix + '-img-name').textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('img-preview-' + prefix + '-img').src = e.target.result;
+      document.getElementById('img-preview-' + prefix).style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImage(prefix) {
+    document.getElementById(prefix + '-image').value = '';
+    document.getElementById(prefix + '-img-name').textContent = '';
+    document.getElementById('img-preview-' + prefix).style.display = 'none';
+  }
+
+  function showFileName(inputId, labelId) {
+    const f = document.getElementById(inputId).files[0];
+    if (f) document.getElementById(labelId).textContent = f.name;
+  }
+
+  // ── Drag-over visual ───────────────────────────────────
+  document.querySelectorAll('.drop-zone').forEach(dz => {
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', () => dz.classList.remove('drag-over'));
+  });
+
+  // ── Toast ──────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = (type === 'success' ? '✅ ' : '❌ ') + msg;
+    t.className = 'show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.className = ''; }, 3500);
+  }
+
+  // ── Loading state ──────────────────────────────────────
+  function setLoading(btnId, on) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = on;
+    btn.classList.toggle('loading', on);
+  }
+
+  // ── Send Single ────────────────────────────────────────
+  async function sendSingle() {
+    const phone   = document.getElementById('single-phone').value.trim();
+    const message = document.getElementById('single-message').value.trim();
+    const image   = document.getElementById('single-image').files[0];
+
+    if (!phone || !message) return showToast('Phone and message are required.', 'error');
+
+    setLoading('btn-single', true);
+
+    const fd = new FormData();
+    fd.append('phone', phone);
+    fd.append('message', message);
+    if (image) fd.append('image', image);
+
+    try {
+      const res = await fetch('/api/send-single', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('Message sent!');
+        document.getElementById('single-phone').value = '';
+        document.getElementById('single-message').value = '';
+        removeImage('single');
+      } else {
+        showToast(data.error || 'Failed to send.', 'error');
+      }
+    } catch (e) {
+      showToast('Network error.', 'error');
+    } finally {
+      setLoading('btn-single', false);
+    }
+  }
+
+  // ── Send Bulk ──────────────────────────────────────────
+  async function sendBulk() {
+    const xlsxFile = document.getElementById('bulk-xlsx').files[0];
+    const message  = document.getElementById('bulk-message').value.trim();
+    const image    = document.getElementById('bulk-image').files[0];
+
+    if (!xlsxFile) return showToast('Please upload an Excel file.', 'error');
+
+    setLoading('btn-bulk', true);
+
+    const fd = new FormData();
+    fd.append('xlsx', xlsxFile);
+    fd.append('message', message);
+    if (image) fd.append('image', image);
+
+    // Reset progress
+    const progressEl  = document.getElementById('bulk-progress');
+    const bar          = document.getElementById('bulk-bar');
+    const countEl      = document.getElementById('bulk-progress-count');
+    const labelEl      = document.getElementById('bulk-progress-label');
+    const logEl        = document.getElementById('bulk-log');
+    progressEl.style.display = 'block';
+    bar.style.width = '0%';
+    logEl.innerHTML = '';
+    countEl.textContent = '...';
+    labelEl.textContent = 'Starting...';
+
+    let total = 0, done = 0;
+
+    try {
+      const res = await fetch('/api/send-bulk', { method: 'POST', body: fd });
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+
+      while (true) {
+        const { value, done: streamDone } = await reader.read();
+        if (streamDone) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith('data:')) continue;
+          const evt = JSON.parse(line.slice(5).trim());
+
+          if (evt.type === 'total') {
+            total = evt.total;
+            labelEl.textContent = `Sending to ${total} contacts...`;
+            countEl.textContent = `0 / ${total}`;
+          }
+
+          if (evt.type === 'result') {
+            done++;
+            const pct = Math.round((done / total) * 100);
+            bar.style.width = pct + '%';
+            countEl.textContent = `${done} / ${total}`;
+
+            const item = document.createElement('div');
+            item.className = 'log-item' + (evt.ok ? '' : ' fail');
+            item.innerHTML = `
+              <span class="li-icon">${evt.ok ? '✅' : '❌'}</span>
+              <span class="li-name">${evt.name}</span>
+              <span class="li-phone">${evt.phone}</span>
+              ${!evt.ok ? `<span style="color:var(--error);font-size:.7rem">${evt.error}</span>` : ''}
+            `;
+            logEl.prepend(item);
+          }
+
+          if (evt.type === 'done') {
+            labelEl.textContent = `Done — ${evt.success} sent, ${evt.failed} failed`;
+            bar.style.width = '100%';
+            setLoading('btn-bulk', false);
+          }
+        }
+      }
+    } catch (e) {
+      showToast('Bulk send error: ' + e.message, 'error');
+      setLoading('btn-bulk', false);
+    }
+  }
+
+
+  // ── Logout ─────────────────────────────────────────────
+  function confirmLogout() {
+    document.getElementById('confirm-overlay').classList.add('show');
+  }
+  function closeConfirm() {
+    document.getElementById('confirm-overlay').classList.remove('show');
+  }
+  async function doLogout() {
+    closeConfirm();
+    const btn = document.getElementById('btn-logout');
+    btn.textContent = 'Logging out...';
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/logout', { method: 'POST' });
+      // Parse JSON safely — body might be empty on some errors
+      let data = { ok: false };
+      try { data = await res.json(); } catch (_) {}
+
+      if (res.ok || data.ok) {
+        showToast('Logged out successfully.');
+        // Hide button — socket 'status' event will also hide it
+        btn.classList.remove('visible');
+      } else {
+        showToast(data.error || 'Logout failed.', 'error');
+        btn.textContent = '⏏︎ Logout';
+        btn.disabled = false;
+      }
+    } catch (e) {
+      // Fetch itself failed (server crashed/restarted) — still treat as success
+      showToast('Logged out (server disconnected).');
+      btn.classList.remove('visible');
+    }
+  }
+
+  // Show/hide logout button based on WA state
+  socket.on('status', ({ state }) => {
+    const logoutBtn = document.getElementById('btn-logout');
+    if (state === 'ready') {
+      logoutBtn.classList.add('visible');
+      logoutBtn.textContent = '⏏︎ Logout';
+      logoutBtn.disabled = false;
+    } else {
+      logoutBtn.classList.remove('visible');
+    }
+  });
+  // ── Enter key to send single ───────────────────────────
+  document.getElementById('single-phone').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('single-message').focus();
+  });
+</script>
+</body>
+</html>
