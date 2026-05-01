@@ -10,3 +10,21 @@ pm2 restart wa-sender
  npm install -g pm2 
 
  npm install  
+
+ # 1. Generate startup script (run this and copy/paste the output command)
+pm2 startup
+
+# 2. Save current process list
+pm2 save
+
+
+# Delete and re-save
+pm2 delete wa-sender
+pm2 start ecosystem.config.js
+pm2 save --force
+
+# Re-run startup
+pm2 unstartup
+pm2 startup
+# → copy and run the printed command
+pm2 save

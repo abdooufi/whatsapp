@@ -1,0 +1,6 @@
+2026/05/01-13:55:08.902 6f31 Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Local Storage/leveldb/MANIFEST-000001
+2026/05/01-13:55:08.902 6f31 Recovering log #3
+2026/05/01-13:55:08.903 6f31 Reusing old log /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Local Storage/leveldb/000003.log 
+2026/05/01-13:56:08.975 6f2e Level-0 table #5: started
+2026/05/01-13:56:08.977 6f2e Level-0 table #5: 18105 bytes OK
+2026/05/01-13:56:08.979 6f2e Delete type=0 #3

@@ -1,14 +1,3 @@
-2026/04/30-08:35:49.004 367b47 Creating DB /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb since it was missing.
-2026/04/30-08:35:49.006 367b47 Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2026/04/30-18:29:00.592 367b47 Level-0 table #5: started
-2026/04/30-18:29:00.616 367b47 Level-0 table #5: 1108847 bytes OK
-2026/04/30-18:29:00.620 367b47 Delete type=0 #3
-2026/05/01-09:56:15.019 367b45 Level-0 table #7: started
-2026/05/01-09:56:15.039 367b45 Level-0 table #7: 928593 bytes OK
-2026/05/01-09:56:15.042 367b45 Delete type=0 #4
-2026/05/01-09:58:56.371 367b45 Compacting 1@1 + 1@2 files
-2026/05/01-09:58:56.399 367b45 Generated table #8@1: 12735 keys, 852032 bytes
-2026/05/01-09:58:56.399 367b45 Compacted 1@1 + 1@2 files => 852032 bytes
-2026/05/01-09:58:56.399 367b45 compacted to: files[ 0 0 1 0 0 0 0 ]
-2026/05/01-09:58:56.400 367b45 Delete type=2 #7
-2026/05/01-09:58:56.400 367b45 Delete type=2 #5
+2026/05/01-13:58:43.882 3799 Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/05/01-13:58:43.888 3799 Recovering log #92
+2026/05/01-13:58:44.011 3799 Reusing old log /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000092.log 

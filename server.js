@@ -154,24 +154,40 @@ function createClient() {
     console.log('🔌 Disconnected:', reason);
     io.emit('status', { state: 'disconnected', message: 'Disconnected. Reconnecting...' });
 
-    // Auto reconnect after 5 seconds
-    setTimeout(() => {
-      console.log('🔄 Auto-reconnecting...');
-      try {
-        client = createClient();
-        client.initialize();
-      } catch (e) {
-        console.error('Auto-reconnect failed:', e.message);
-      }
-    }, 5000);
+    // Auto reconnect using the same retry boot logic
+    setTimeout(() => bootClient(), 5000);
   });
 
   return c;
 }
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-client = createClient();
-client.initialize();
+// ── Boot with retry ──────────────────────────────────────────────────────────
+// After a server restart, the OS and Chromium need a moment to be ready.
+// This retries initialization up to 5 times with increasing delays.
+const BOOT_RETRIES   = 5;
+const BOOT_DELAY_MS  = 8000; // 8s between each retry
+
+async function bootClient(attempt = 1) {
+  console.log(`🔄 Boot attempt ${attempt}/${BOOT_RETRIES}...`);
+  try {
+    client = createClient();
+    await client.initialize();
+  } catch (err) {
+    console.error(`❌ Boot attempt ${attempt} failed:`, err.message);
+    if (attempt < BOOT_RETRIES) {
+      const delay = BOOT_DELAY_MS * attempt; // 8s, 16s, 24s, 32s, 40s
+      console.log(`⏳ Retrying in ${delay / 1000}s...`);
+      io.emit('status', { state: 'loading', message: `Connecting... retry ${attempt}/${BOOT_RETRIES}` });
+      setTimeout(() => bootClient(attempt + 1), delay);
+    } else {
+      console.error('💀 All boot attempts failed. Check Chromium/Puppeteer installation.');
+      io.emit('status', { state: 'error', message: 'Failed to start. Restart the server.' });
+    }
+  }
+}
+
+// Delay first boot by 5s to let OS fully start after reboot
+setTimeout(() => bootClient(), 5000);
 
 // ── API: status ───────────────────────────────────────────────────────────────
 app.get('/api/status', (req, res) => {
@@ -307,15 +323,7 @@ app.post('/api/logout', async (req, res) => {
   res.json({ ok: true });
 
   // 5. Reinitialise client after a short delay so fresh QR appears in browser
-  setTimeout(() => {
-    try {
-      client = createClient();
-      client.initialize();
-      console.log('🔄 New client initializing...');
-    } catch (e) {
-      console.error('Reinit failed:', e.message);
-    }
-  }, 3000);
+  setTimeout(() => bootClient(), 3000);
 });
 
 // ── Socket.IO ─────────────────────────────────────────────────────────────────

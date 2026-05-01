@@ -161,3 +161,91 @@
 2026-04-30T09:20:38: 📱 QR code ready — waiting for scan...
 2026-04-30T09:20:58: 📱 QR code ready — waiting for scan...
 2026-04-30T09:21:18: 📱 QR code ready — waiting for scan...
+2026-05-01T13:14:12: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-05-01T13:14:12: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-05-01T13:14:12: 🔧 Creating WhatsApp client...
+2026-05-01T13:14:12: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-05-01T13:14:12: 
+2026-05-01T13:14:12: 🚀 Server running → http://localhost:3000
+2026-05-01T13:14:12: 
+2026-05-01T13:14:18: 📱 QR code ready — waiting for scan...
+2026-05-01T13:14:45: 🔐 Authenticated successfully
+2026-05-01T13:14:45: 🔐 Authenticated successfully
+2026-05-01T13:14:45: 🔐 Authenticated successfully
+2026-05-01T13:14:45: 🔐 Authenticated successfully
+2026-05-01T13:14:45: 🔐 Authenticated successfully
+2026-05-01T13:14:46: ✅ WhatsApp client ready
+2026-05-01T13:34:54: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-05-01T13:34:54: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-05-01T13:34:54: 🔧 Creating WhatsApp client...
+2026-05-01T13:34:54: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-05-01T13:34:54: 
+2026-05-01T13:34:54: 🚀 Server running → http://localhost:3000
+2026-05-01T13:34:54: 
+2026-05-01T13:35:02: 🔐 Authenticated successfully
+2026-05-01T13:35:02: ✅ WhatsApp client ready
+2026-05-01T13:36:52: 
+2026-05-01T13:36:52: 📤 Bulk send started — 2 contacts
+2026-05-01T13:36:52:   ✅ [2/2] Row 3 (96897633688)
+2026-05-01T13:36:52: 
+2026-05-01T13:36:52: 📊 Done — ✅ 1 sent, ❌ 1 failed
+2026-05-01T13:36:52: 
+2026-05-01T13:37:06: 
+2026-05-01T13:37:06: 📤 Bulk send started — 2 contacts
+2026-05-01T13:37:06:   ✅ [1/2] Row 2 (96898216618)
+2026-05-01T13:37:22:   ✅ [2/2] Row 3 (96897633688)
+2026-05-01T13:37:22: 
+2026-05-01T13:37:22: 📊 Done — ✅ 2 sent, ❌ 0 failed
+2026-05-01T13:37:22: 
+2026-05-01T13:44:05: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-05-01T13:44:05: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-05-01T13:44:05: 🔧 Creating WhatsApp client...
+2026-05-01T13:44:05: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-05-01T13:44:05: 
+2026-05-01T13:44:05: 🚀 Server running → http://localhost:3000
+2026-05-01T13:44:05: 
+2026-05-01T13:44:12: 🔐 Authenticated successfully
+2026-05-01T13:45:48: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-05-01T13:45:48: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-05-01T13:45:48: 🔧 Creating WhatsApp client...
+2026-05-01T13:45:48: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-05-01T13:45:48: 
+2026-05-01T13:45:48: 🚀 Server running → http://localhost:3000
+2026-05-01T13:45:48: 
+2026-05-01T13:45:52: 🔐 Authenticated successfully
+2026-05-01T13:45:52: ✅ WhatsApp client ready
+2026-05-01T13:52:28: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-05-01T13:52:28: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-05-01T13:52:28: 
+2026-05-01T13:52:28: 🚀 Server running → http://localhost:3000
+2026-05-01T13:52:28: 
+2026-05-01T13:52:33: 🔄 Boot attempt 1/5...
+2026-05-01T13:52:33: 🔧 Creating WhatsApp client...
+2026-05-01T13:52:33: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-05-01T13:52:38: 🔐 Authenticated successfully
+2026-05-01T13:55:03: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-05-01T13:55:03: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-05-01T13:55:03: 
+2026-05-01T13:55:03: 🚀 Server running → http://localhost:3000
+2026-05-01T13:55:03: 
+2026-05-01T13:55:08: 🔄 Boot attempt 1/5...
+2026-05-01T13:55:08: 🔧 Creating WhatsApp client...
+2026-05-01T13:55:08: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-05-01T13:55:13: 🔐 Authenticated successfully
+2026-05-01T13:55:13: ✅ WhatsApp client ready
+2026-05-01T13:55:41: 
+2026-05-01T13:55:41: 📤 Bulk send started — 2 contacts
+2026-05-01T13:55:42:   ✅ [2/2] Row 3 (96897633688)
+2026-05-01T13:55:42: 
+2026-05-01T13:55:42: 📊 Done — ✅ 1 sent, ❌ 1 failed
+2026-05-01T13:55:42: 
+2026-05-01T13:58:34: 📁 App directory  : /Users/abdullah/Desktop/node/whatsapp
+2026-05-01T13:58:34: 🌐 Static from    : /Users/abdullah/Desktop/node/whatsapp/public
+2026-05-01T13:58:34: 
+2026-05-01T13:58:34: 🚀 Server running → http://localhost:3000
+2026-05-01T13:58:34: 
+2026-05-01T13:58:39: 🔄 Boot attempt 1/5...
+2026-05-01T13:58:39: 🔧 Creating WhatsApp client...
+2026-05-01T13:58:39: 💾 Session path: /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth
+2026-05-01T13:58:46: 🔐 Authenticated successfully
+2026-05-01T13:58:47: ✅ WhatsApp client ready

@@ -1,2 +1,3 @@
-2026/04/30-08:35:46.800 367b5e Creating DB /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Session Storage since it was missing.
-2026/04/30-08:35:46.802 367b5e Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Session Storage/MANIFEST-000001
+2026/05/01-13:58:43.858 3763 Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Session Storage/MANIFEST-000001
+2026/05/01-13:58:43.858 3763 Recovering log #3
+2026/05/01-13:58:43.888 3763 Reusing old log /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Session Storage/000003.log 
