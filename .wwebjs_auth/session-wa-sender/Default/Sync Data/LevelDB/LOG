@@ -1,3 +1,2 @@
-2026/05/01-13:58:42.516 3764 Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Sync Data/LevelDB/MANIFEST-000001
-2026/05/01-13:58:42.526 3764 Recovering log #3
-2026/05/01-13:58:42.526 3764 Reusing old log /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Sync Data/LevelDB/000003.log 
+2026/05/01-14:02:47.616 52d9 Creating DB /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Sync Data/LevelDB since it was missing.
+2026/05/01-14:02:47.621 52d9 Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Sync Data/LevelDB/MANIFEST-000001

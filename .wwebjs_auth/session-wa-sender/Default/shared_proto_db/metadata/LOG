@@ -1,3 +1,2 @@
-2026/05/01-13:58:42.796 3797 Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/shared_proto_db/metadata/MANIFEST-000001
-2026/05/01-13:58:42.797 3797 Recovering log #3
-2026/05/01-13:58:42.797 3797 Reusing old log /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/shared_proto_db/metadata/000003.log 
+2026/05/01-14:02:47.655 52ec Creating DB /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/shared_proto_db/metadata since it was missing.
+2026/05/01-14:02:47.657 52ec Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/shared_proto_db/metadata/MANIFEST-000001

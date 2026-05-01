@@ -1,3 +1,2 @@
-2026/05/01-13:58:42.522 3798 Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Site Characteristics Database/MANIFEST-000001
-2026/05/01-13:58:42.526 3798 Recovering log #3
-2026/05/01-13:58:42.526 3798 Reusing old log /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Site Characteristics Database/000003.log 
+2026/05/01-14:02:47.620 52ec Creating DB /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Site Characteristics Database since it was missing.
+2026/05/01-14:02:47.625 52ec Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/Site Characteristics Database/MANIFEST-000001
