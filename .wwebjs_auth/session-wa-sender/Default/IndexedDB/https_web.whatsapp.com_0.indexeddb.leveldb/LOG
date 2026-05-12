@@ -1,2 +1,17 @@
-2026/05/01-14:02:49.591 52da Creating DB /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb since it was missing.
-2026/05/01-14:02:49.594 52da Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/05/12-19:56:32.069 3cee1b Reusing MANIFEST /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000610
+2026/05/12-19:56:32.070 3cee1b Recovering log #682
+2026/05/12-19:56:32.070 3cee1b Reusing old log /Users/abdullah/Desktop/node/whatsapp/.wwebjs_auth/session-wa-sender/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000682.log 
+2026/05/12-19:56:32.942 3cee1a Compacting 1@1 + 5@2 files
+2026/05/12-19:56:32.988 3cee1a Generated table #685@1: 34632 keys, 2158818 bytes
+2026/05/12-19:56:33.024 3cee1a Generated table #686@1: 90870 keys, 2241883 bytes
+2026/05/12-19:56:33.059 3cee1a Generated table #687@1: 79414 keys, 2244522 bytes
+2026/05/12-19:56:33.088 3cee1a Generated table #688@1: 33372 keys, 2199197 bytes
+2026/05/12-19:56:33.109 3cee1a Generated table #689@1: 20515 keys, 1590645 bytes
+2026/05/12-19:56:33.109 3cee1a Compacted 1@1 + 5@2 files => 10435065 bytes
+2026/05/12-19:56:33.112 3cee1a compacted to: files[ 0 0 5 0 0 0 0 ]
+2026/05/12-19:56:33.112 3cee1a Delete type=2 #677
+2026/05/12-19:56:33.112 3cee1a Delete type=2 #679
+2026/05/12-19:56:33.112 3cee1a Delete type=2 #678
+2026/05/12-19:56:33.112 3cee1a Delete type=2 #680
+2026/05/12-19:56:33.112 3cee1a Delete type=2 #681
+2026/05/12-19:56:33.112 3cee1a Delete type=2 #683

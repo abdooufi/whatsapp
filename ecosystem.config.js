@@ -29,6 +29,7 @@ module.exports = {
         NODE_ENV: 'production',
         PORT:     3000,
         PWD:      './whatsapp',
+        ANTHROPIC_API_KEY: 'sk-ant-your-key-here',  // ← a
       },
     },
   ],

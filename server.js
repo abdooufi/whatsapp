@@ -91,6 +91,55 @@ async function sendOne(chatId, message, mediaBuffer, mediaMime, mediaName) {
   }
 }
 
+
+// ── Custom keyword replies ────────────────────────────────────────────────────
+// Add as many keywords and replies as you want.
+// Keys are lowercase — matching is case-insensitive.
+const CUSTOM_REPLIES = [
+  {
+    keywords: ['hi', 'hello', 'hey', 'هلا', 'مرحبا', 'اهلا', 'السلام عليكم'],
+    reply:    'Hello! 👋 Welcome. How can I help you today?',
+  },
+  {
+    keywords: ['price', 'pricing', 'cost', 'how much', 'كم السعر', 'السعر', 'الاسعار'],
+    reply:    '💰 For pricing details please visit our website or a human agent will contact you shortly.',
+  },
+  {
+    keywords: ['hours', 'open', 'working hours', 'اوقات', 'دوام', 'وقت العمل'],
+    reply:    '🕐 We are open Saturday–Thursday, 9am to 6pm.',
+  },
+  {
+    keywords: ['location', 'address', 'where', 'العنوان', 'الموقع', 'وين'],
+    reply:    "📍 We are located in Muscat. Here is our location: https://www.google.com/maps/place/23%C2%B035'11.3%22N+58%C2%B008'36.1%22E/@23.586903,58.1421775,293m/data=!3m1!1e3!4m4!3m3!8m2!3d23.586458!4d58.143367?entry=ttu&g_ep=EgoyMDI2MDUxMC4wIKXMDSoASAFQAw%3D%3D"
+  },
+  {
+    keywords: ['thanks', 'thank you', 'شكرا', 'شكراً', 'مشكور'],
+    reply:    'You are welcome! 😊 Is there anything else I can help you with?',
+  },
+  {
+    keywords: ['bye', 'goodbye', 'مع السلامة', 'باي'],
+    reply:    'Goodbye! 👋 Have a great day. Feel free to message us anytime.',
+  },
+  {
+    keywords: ['human', 'agent', 'support', 'موظف', 'دعم', 'تواصل'],
+    reply:    '👤 A human agent will contact you as soon as possible. Please wait.',
+  },
+];
+
+/**
+ * Check if message matches any custom keyword.
+ * Returns the reply string or null if no match.
+ */
+function matchCustomReply(text) {
+  const lower = text.toLowerCase().trim();
+  for (const rule of CUSTOM_REPLIES) {
+    if (rule.keywords.some((kw) => lower.includes(kw.toLowerCase()))) {
+      return rule.reply;
+    }
+  }
+  return null;
+}
+
 // ── WhatsApp client factory ───────────────────────────────────────────────────
 let client;
 let waReady = false;
@@ -156,6 +205,28 @@ function createClient() {
 
     // Auto reconnect using the same retry boot logic
     setTimeout(() => bootClient(), 5000);
+  });
+
+
+  // ── Incoming message handler ──────────────────────────────
+  c.on('message', async (msg) => {
+    if (msg.fromMe)               return; // ignore own messages
+    if (msg.from.endsWith('@g.us')) return; // ignore group messages
+    if (msg.type !== 'chat')      return; // only handle text
+
+    const text = msg.body || '';
+    console.log(`💬 Incoming from ${msg.from}: ${text}`);
+
+    // 1. Check custom keyword replies first
+    const customReply = matchCustomReply(text);
+    if (customReply) {
+      await msg.reply(customReply);
+      console.log(`📌 Custom reply sent to ${msg.from}`);
+      return;
+    }
+
+    // 2. No custom match — ignore
+    console.log(`ℹ️  No custom reply matched for: ${text}`);
   });
 
   return c;
